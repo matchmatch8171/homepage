@@ -46,10 +46,7 @@
         .faq-answer {
             @apply mt-2 px-4 pb-4 text-gray-600;
         }
-        /* モバイルメニュー用 */
-        .mobile-menu {
-            @apply hidden md:hidden; /* Initially hidden on medium and larger screens */
-        }
+        /* .mobile-menu クラスの定義を削除 (Tailwindのクラスを直接HTMLに適用するため) */
     </style>
 </head>
 <body class="bg-gray-50 text-gray-700">
@@ -83,7 +80,7 @@
                 </div>
             </div>
         </div>
-        <div id="mobile-menu" class="mobile-menu">
+        <div id="mobile-menu" class="hidden md:hidden">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="#home" class="block nav-link nav-link-active" data-section="home" aria-current="page">トップ</a>
                 <a href="#features" class="block nav-link" data-section="features">Dmatchの強み</a>
@@ -418,23 +415,20 @@
                         });
 
                         // クリックされたリンクを即座にアクティブにする (スクロール完了を待たずに)
-                        // ただし、スクロールイベントでの最終的な判定を優先するため、ここでは aria-current のみ更新する選択肢も
                         allNavLinks.forEach(link => {
                             link.classList.remove('nav-link-active');
                             link.removeAttribute('aria-current');
                         });
-                        const clickedLinkDesktop = document.querySelector(`header nav a[href="${targetId}"]`);
-                        const clickedLinkMobile = document.querySelector(`#mobile-menu a[href="${targetId}"]`);
-                        if(clickedLinkDesktop && clickedLinkDesktop.dataset.section) {
+                        const clickedLinkDesktop = document.querySelector(`header nav a[href="${targetId}"][data-section]`);
+                        const clickedLinkMobile = document.querySelector(`#mobile-menu a[href="${targetId}"][data-section]`);
+                        if(clickedLinkDesktop) {
                              clickedLinkDesktop.classList.add('nav-link-active');
                              clickedLinkDesktop.setAttribute('aria-current', 'page');
                         }
-                        if(clickedLinkMobile && clickedLinkMobile.dataset.section) {
+                        if(clickedLinkMobile) {
                              clickedLinkMobile.classList.add('nav-link-active');
                              clickedLinkMobile.setAttribute('aria-current', 'page');
                         }
-                        // もしクリックされたのがセクションリンクでない場合（例：フッターのリンクなど）、
-                        // changeActiveLinkに任せるためにここでは何もしないか、特定の条件で上記を実行
                     }
                 });
             });
@@ -483,4 +477,3 @@
     </script>
 </body>
 </html>
-
