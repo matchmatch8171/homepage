@@ -1,1 +1,486 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dmatch - プロのポーカーディーラー派遣サービス</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .hero-bg {
+            /* 背景を単色に変更し、テキストを際立たせる */
+            background-color: #1f2937; /* Tailwindのbg-gray-800相当 */
+            /* 元のbackground-image, background-size, background-positionは削除 */
+        }
+        .nav-link {
+            @apply px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors;
+        }
+        .nav-link-active {
+            @apply bg-red-600 text-white; /* アクティブなリンクの背景色をブランドカラーに合わせる */
+        }
+        .section-title {
+            @apply text-3xl sm:text-4xl font-bold text-center mb-12 text-gray-800;
+        }
+        .card {
+            /* ホバー時に少し浮き上がるエフェクトを追加 */
+            @apply bg-white p-6 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300;
+        }
+        .btn {
+            /* ホバー時の影を強調し、transition-all を適用 */
+            @apply px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2;
+        }
+        .btn-primary {
+            @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+        }
+        .btn-secondary {
+            @apply bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500;
+        }
+        /* アコーディオンFAQ用 */
+        .faq-question {
+            @apply w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 font-medium focus:outline-none transition-colors;
+        }
+        .faq-answer {
+            @apply mt-2 px-4 pb-4 text-gray-600;
+        }
+        /* モバイルメニュー用 */
+        .mobile-menu {
+            @apply hidden md:hidden; /* Initially hidden on medium and larger screens */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-700">
+
+    <header class="bg-gray-800 text-white sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#home" class="text-2xl font-bold text-red-500">Dmatch</a>
+                </div>
+                <nav class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#home" class="nav-link nav-link-active" data-section="home" aria-current="page">トップ</a>
+                        <a href="#features" class="nav-link" data-section="features">Dmatchの強み</a>
+                        <a href="#pricing" class="nav-link" data-section="pricing">料金プラン</a>
+                        <a href="#flow" class="nav-link" data-section="flow">ご利用の流れ</a>
+                        <a href="#faq" class="nav-link" data-section="faq">よくある質問</a>
+                        <a href="#contact" class="nav-link" data-section="contact">お問い合わせ</a>
+                    </div>
+                </nav>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">メインメニューを開く</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="block nav-link nav-link-active" data-section="home" aria-current="page">トップ</a>
+                <a href="#features" class="block nav-link" data-section="features">Dmatchの強み</a>
+                <a href="#pricing" class="block nav-link" data-section="pricing">料金プラン</a>
+                <a href="#flow" class="block nav-link" data-section="flow">ご利用の流れ</a>
+                <a href="#faq" class="block nav-link" data-section="faq">よくある質問</a>
+                <a href="#contact" class="block nav-link" data-section="contact">お問い合わせ</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero-bg pt-20 pb-20 text-white min-h-screen flex items-center">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                    プロのポーカーディーラー、必要な時だけ。<br class="hidden sm:block">
+                    <span class="text-red-500">Dmatch</span>が解決します。
+                </h1>
+                <p class="text-lg sm:text-xl mb-10 max-w-2xl mx-auto">
+                    経験豊富な即戦力ディーラーを派遣し、貴店のポーカーイベントや日常のゲーム運営をスムーズにサポート。育成コストを削減し、最高のゲーム体験を提供します。
+                </p>
+                <div class="space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="#contact" class="btn btn-primary text-lg">今すぐ相談する</a>
+                    <a href="#features" class="btn btn-secondary text-lg">サービス詳細を見る</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-16 sm:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="section-title">Dmatchの強み</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="card text-center">
+                        <div class="flex justify-center mb-4">
+                            <svg class="h-16 w-16 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7v5l3 3" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">即戦力ディーラー</h3>
+                        <p class="text-gray-600">研修済みの経験豊富なディーラーが即対応。育成の手間とコストを削減します。</p>
+                    </div>
+                    <div class="card text-center">
+                        <div class="flex justify-center mb-4">
+                             <svg class="h-16 w-16 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">質の高いサービス</h3>
+                        <p class="text-gray-600">ルール、進行、トラブル対応に精通。プレイヤーに快適なゲーム体験と安心を提供します。</p>
+                    </div>
+                    <div class="card text-center">
+                        <div class="flex justify-center mb-4">
+                            <svg class="h-16 w-16 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">コスト最適化</h3>
+                        <p class="text-gray-600">お客様の増減に合わせて必要な人数だけを派遣。人件費を効率的に管理できます。</p>
+                    </div>
+                    <div class="card text-center">
+                        <div class="flex justify-center mb-4">
+                            <svg class="h-16 w-16 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">透明な料金体系</h3>
+                        <p class="text-gray-600">サービス利用費はディーラー報酬の20%で明瞭。予算管理がしやすいです。</p>
+                    </div>
+                </div>
+                <div class="mt-16 text-center">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">こんなお悩みありませんか？ Dmatchが解決します！</h3>
+                    <ul class="list-disc list-inside inline-block text-left text-gray-600 space-y-2">
+                        <li>急なイベントでディーラーが足りない…</li>
+                        <li>ディーラー育成に時間とコストがかかる…</li>
+                        <li>人件費を最適化したい…</li>
+                        <li>安定した質の高いディーラーを確保したい…</li>
+                    </ul>
+                    <div class="mt-10">
+                        <a href="#pricing" class="btn btn-primary text-lg">料金プランを確認する</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="py-16 sm:py-24 bg-gray-100">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="section-title">料金プラン</h2>
+                <div class="max-w-2xl mx-auto bg-white p-8 sm:p-10 rounded-xl shadow-2xl text-center">
+                    <h3 class="text-2xl sm:text-3xl font-semibold text-gray-800 mb-4">シンプルな料金体系</h3>
+                    <p class="text-gray-600 mb-6 text-lg">サービス利用費は、ディーラーにお渡しする報酬の<strong class="text-red-600 text-3xl sm:text-4xl font-bold">20%</strong>です。</p>
+                    <div class="bg-red-50 p-6 rounded-lg mb-6">
+                        <p class="text-gray-700 font-medium">例：ディーラー報酬 10,000円の場合</p>
+                        <p class="text-gray-700">弊社手数料: 10,000円 × 20% = <strong class="text-xl">2,000円</strong></p>
+                    </div>
+                    <p class="text-gray-600 mb-8">イベントの規模、時間、必要なディーラー数などに応じて最適なお見積もりを提示します。まずはお気軽にご相談ください。</p>
+                    <a href="#contact" class="btn btn-primary text-lg">無料でお見積もり・相談</a>
+                </div>
+                <p class="text-center mt-8 text-sm text-gray-500">※料金は市場の変動などにより変更される場合があります。その際は事前にご案内いたします。</p>
+            </div>
+        </section>
+
+        <section id="flow" class="py-16 sm:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="section-title">ご利用の流れ</h2>
+                <div class="grid md:grid-cols-3 gap-8 text-center">
+                    <div class="card">
+                        <div class="flex justify-center mb-4">
+                            <div class="bg-red-500 text-white rounded-full h-12 w-12 flex items-center justify-center text-xl font-bold">1</div>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">お申し込み</h3>
+                        <p class="text-gray-600">当ウェブサイトのお問い合わせフォーム、またはお電話にてお気軽にお申し込みください。ご希望の日時、必要なディーラー数、イベント内容などをお知らせください。</p>
+                    </div>
+                    <div class="card">
+                        <div class="flex justify-center mb-4">
+                            <div class="bg-red-500 text-white rounded-full h-12 w-12 flex items-center justify-center text-xl font-bold">2</div>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">お見積もりとご契約</h3>
+                        <p class="text-gray-600">いただいた情報に基づき、最適なプランとお見積もりをご提案します。内容にご納得いただけましたら、契約を締結させていただきます。</p>
+                    </div>
+                    <div class="card">
+                        <div class="flex justify-center mb-4">
+                            <div class="bg-red-500 text-white rounded-full h-12 w-12 flex items-center justify-center text-xl font-bold">3</div>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">ディーラー派遣</h3>
+                        <p class="text-gray-600">ご指定の日時に、経験豊富なディーラーを派遣します。ポーカーゲームの進行をプロフェッショナルにサポートします。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" class="py-16 sm:py-24 bg-gray-100">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="section-title">よくあるご質問</h2>
+                <div class="max-w-3xl mx-auto space-y-4">
+                    <div class="faq-item">
+                        <button class="faq-question flex justify-between items-center">
+                            <span>どのような人がディーラーとして来るのですか？</span>
+                            <svg class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="faq-answer hidden">
+                            <p>弊社独自の研修を受け、ポーカーのルール、進行、マナーに精通した経験豊富なディーラーです。お客様に最高のゲーム体験を提供できるよう努めております。</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question flex justify-between items-center">
+                            <span>最低何時間から依頼できますか？</span>
+                            <svg class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="faq-answer hidden">
+                            <p>基本的には最低4時間からのご依頼をお願いしておりますが、イベント内容や状況に応じて柔軟に対応いたしますので、お気軽にご相談ください。</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question flex justify-between items-center">
+                            <span>対応エリアはどこですか？</span>
+                            <svg class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="faq-answer hidden">
+                            <p>現在は東京都内を中心にサービスを提供しております。その他近郊エリアについても対応可能な場合がございますので、詳細はお問い合わせください。</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question flex justify-between items-center">
+                            <span>急な依頼でも対応可能ですか？</span>
+                            <svg class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="faq-answer hidden">
+                            <p>ディーラーのスケジュール状況によりますが、可能な限り迅速に対応させていただきます。まずは一度、お早めにご相談ください。急な日程変更が発生する場合、事前にご連絡いたします。</p>
+                        </div>
+                    </div>
+                     <div class="faq-item">
+                        <button class="faq-question flex justify-between items-center">
+                            <span>キャンセル料はかかりますか？</span>
+                            <svg class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="faq-answer hidden">
+                            <p>ご契約後のキャンセルについては、時期に応じてキャンセル料が発生する場合がございます。詳細については契約時にご説明いたします。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-16 sm:py-24 bg-gray-800 text-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12">お問い合わせ・ご相談</h2>
+                <div class="max-w-2xl mx-auto bg-white text-gray-700 p-8 sm:p-10 rounded-xl shadow-2xl">
+                    <p class="text-center mb-6">ポーカーディーラー派遣に関するご質問、お見積もりのご依頼など、お気軽にお問い合わせください。</p>
+                    <form id="contactForm">
+                        <div class="mb-4">
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">お名前<span class="text-red-500">*</span></label>
+                            <input type="text" name="name" id="name" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500" placeholder="山田 太郎">
+                        </div>
+                        <div class="mb-4">
+                            <label for="company" class="block text-sm font-medium text-gray-700 mb-1">会社名・店舗名</label>
+                            <input type="text" name="company" id="company" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500" placeholder="株式会社Dmatch">
+                        </div>
+                        <div class="mb-4">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">メールアドレス<span class="text-red-500">*</span></label>
+                            <input type="email" name="email" id="email" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500" placeholder="info@example.com">
+                        </div>
+                        <div class="mb-4">
+                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">電話番号</label>
+                            <input type="tel" name="phone" id="phone" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500" placeholder="090-1234-5678">
+                        </div>
+                        <div class="mb-6">
+                            <label for="message" class="block text-sm font-medium text-gray-700 mb-1">お問い合わせ内容<span class="text-red-500">*</span></label>
+                            <textarea name="message" id="message" rows="4" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500" placeholder="イベント日時、場所、希望人数、その他ご質問などをご記入ください。"></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary text-lg w-full sm:w-auto">送信する</button>
+                        </div>
+                    </form>
+                    <div id="form-message" class="mt-4 text-center"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="disclaimer" class="py-16 sm:py-24 bg-gray-50">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="section-title">免責事項</h2>
+                <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg space-y-6 text-sm text-gray-600">
+                    <div>
+                        <h3 class="font-semibold text-gray-700 mb-1">ディーラーの業務遂行に関する責任について</h3>
+                        <p>弊社は、ディーラーに対して必要な研修とサポートを提供しますが、業務上で発生するクレームやトラブルについては、貴店との協力のもとで解決をお願いいたします。</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-700 mb-1">料金の変更について</h3>
+                        <p>サービス料金やディーラーの報酬については、事前にお知らせした料金に基づいて提供されますが、市場の変動やその他の理由により変更されることがあります。その際は、改めてご案内いたします。</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-700 mb-1">急な日程変更について</h3>
+                        <p>イベントや急な事情により、ディーラー派遣のスケジュール変更が発生する場合があります。変更の際は、事前にご連絡させていただきます。</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-700 mb-1">不可抗力によるトラブルについて</h3>
+                        <p>システム障害や天候、その他の不可抗力により、サービス提供が一時的に不可能となった場合、弊社は責任を負いかねます。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300 py-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold text-red-500 mb-2">Dmatch</h3>
+                    <p class="text-sm">プロのポーカーディーラー派遣サービス。お客様のイベント成功をサポートします。</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-2">クイックリンク</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#features" class="hover:text-red-400 transition-colors">Dmatchの強み</a></li>
+                        <li><a href="#pricing" class="hover:text-red-400 transition-colors">料金プラン</a></li>
+                        <li><a href="#flow" class="hover:text-red-400 transition-colors">ご利用の流れ</a></li>
+                        <li><a href="#faq" class="hover:text-red-400 transition-colors">よくある質問</a></li>
+                        <li><a href="#disclaimer" class="hover:text-red-400 transition-colors">免責事項</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-2">会社情報</h4>
+                    <p class="text-sm">株式会社Dmatch (運営会社)</p>
+                    <p class="text-sm">〒XXX-XXXX 東京都渋谷区XXXXX</p>
+                    <p class="text-sm">電話: 03-XXXX-XXXX</p>
+                    <p class="text-sm">メール: info@dmatch.example.com</p>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-700 text-center text-sm">
+                <p>&copy; <span id="currentYear"></span> Dmatch. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 年を自動更新
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            // スムーズスクロールとアクティブリンク処理
+            const navLinks = document.querySelectorAll('header nav a[href^="#"], header #mobile-menu a[href^="#"], footer a[href^="#"], .hero-bg a[href^="#"], #features a[href^="#pricing"]'); // CTAボタンも対象に
+            const sections = document.querySelectorAll('main section');
+            const headerHeight = document.querySelector('header').offsetHeight;
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const allNavLinks = document.querySelectorAll('header nav a[data-section], #mobile-menu a[data-section]');
+
+
+            function changeActiveLink() {
+                let currentSectionId = '';
+                // 現在表示されているセクションを特定
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (window.scrollY >= sectionTop - headerHeight - 50) { // 50pxのオフセットを追加して判定を調整
+                        currentSectionId = section.id;
+                    }
+                });
+
+                allNavLinks.forEach((link) => {
+                    link.classList.remove('nav-link-active');
+                    link.removeAttribute('aria-current');
+                    if (link.getAttribute('data-section') === currentSectionId) {
+                        link.classList.add('nav-link-active');
+                        link.setAttribute('aria-current', 'page');
+                    }
+                });
+            }
+            
+            // 初期ロード時とスクロール時にアクティブリンクを更新
+            window.addEventListener('scroll', changeActiveLink);
+            changeActiveLink(); 
+
+            navLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        // モバイルメニューが開いていれば閉じる
+                        if (!mobileMenu.classList.contains('hidden')) {
+                            mobileMenu.classList.add('hidden');
+                            mobileMenuButton.children[0].classList.remove('hidden'); // Show burger
+                            mobileMenuButton.children[1].classList.add('hidden'); // Hide X
+                            mobileMenuButton.setAttribute('aria-expanded', 'false');
+                        }
+                        
+                        // スクロール実行
+                        window.scrollTo({
+                            top: targetElement.offsetTop - headerHeight,
+                            behavior: 'smooth'
+                        });
+
+                        // クリックされたリンクを即座にアクティブにする (スクロール完了を待たずに)
+                        // ただし、スクロールイベントでの最終的な判定を優先するため、ここでは aria-current のみ更新する選択肢も
+                        allNavLinks.forEach(link => {
+                            link.classList.remove('nav-link-active');
+                            link.removeAttribute('aria-current');
+                        });
+                        const clickedLinkDesktop = document.querySelector(`header nav a[href="${targetId}"]`);
+                        const clickedLinkMobile = document.querySelector(`#mobile-menu a[href="${targetId}"]`);
+                        if(clickedLinkDesktop && clickedLinkDesktop.dataset.section) {
+                             clickedLinkDesktop.classList.add('nav-link-active');
+                             clickedLinkDesktop.setAttribute('aria-current', 'page');
+                        }
+                        if(clickedLinkMobile && clickedLinkMobile.dataset.section) {
+                             clickedLinkMobile.classList.add('nav-link-active');
+                             clickedLinkMobile.setAttribute('aria-current', 'page');
+                        }
+                        // もしクリックされたのがセクションリンクでない場合（例：フッターのリンクなど）、
+                        // changeActiveLinkに任せるためにここでは何もしないか、特定の条件で上記を実行
+                    }
+                });
+            });
+
+
+            // モバイルメニューのトグル
+            mobileMenuButton.addEventListener('click', () => {
+                const isExpanded = mobileMenu.classList.toggle('hidden');
+                mobileMenuButton.setAttribute('aria-expanded', String(!isExpanded));
+                mobileMenuButton.children[0].classList.toggle('hidden'); // Toggle burger
+                mobileMenuButton.children[1].classList.toggle('hidden'); // Toggle X
+            });
+            
+            // FAQアコーディオン
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const questionButton = item.querySelector('.faq-question');
+                const answerDiv = item.querySelector('.faq-answer');
+                const icon = questionButton.querySelector('svg');
+
+                questionButton.addEventListener('click', () => {
+                    const isHidden = answerDiv.classList.contains('hidden');
+                    answerDiv.classList.toggle('hidden');
+                    icon.classList.toggle('rotate-180', !isHidden);
+                    questionButton.setAttribute('aria-expanded', String(!isHidden));
+                });
+            });
+
+            // お問い合わせフォームの処理 (ダミー)
+            const contactForm = document.getElementById('contactForm');
+            const formMessage = document.getElementById('form-message');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    formMessage.textContent = 'お問い合わせありがとうございます。メッセージが送信されました。';
+                    formMessage.className = 'mt-4 text-center text-green-600 p-3 bg-green-100 rounded-md';
+                    contactForm.reset();
+
+                    setTimeout(() => {
+                        formMessage.textContent = '';
+                        formMessage.className = 'mt-4 text-center';
+                    }, 5000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
 
