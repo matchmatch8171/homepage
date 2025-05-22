@@ -12,25 +12,21 @@
             scroll-behavior: smooth;
         }
         .hero-bg {
-            /* 背景を単色に変更し、テキストを際立たせる */
             background-color: #1f2937; /* Tailwindのbg-gray-800相当 */
-            /* 元のbackground-image, background-size, background-positionは削除 */
         }
         .nav-link {
             @apply px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors;
         }
         .nav-link-active {
-            @apply bg-red-600 text-white; /* アクティブなリンクの背景色をブランドカラーに合わせる */
+            @apply bg-red-600 text-white;
         }
         .section-title {
             @apply text-3xl sm:text-4xl font-bold text-center mb-12 text-gray-800;
         }
         .card {
-            /* ホバー時に少し浮き上がるエフェクトを追加 */
             @apply bg-white p-6 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300;
         }
         .btn {
-            /* ホバー時の影を強調し、transition-all を適用 */
             @apply px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2;
         }
         .btn-primary {
@@ -39,14 +35,12 @@
         .btn-secondary {
             @apply bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500;
         }
-        /* アコーディオンFAQ用 */
         .faq-question {
             @apply w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 font-medium focus:outline-none transition-colors;
         }
         .faq-answer {
             @apply mt-2 px-4 pb-4 text-gray-600;
         }
-        /* .mobile-menu クラスの定義を削除 (Tailwindのクラスを直接HTMLに適用するため) */
     </style>
 </head>
 <body class="bg-gray-50 text-gray-700">
@@ -356,26 +350,171 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+    <script type="module">
+        // Firebase SDKのインポート
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js"; // 必要であればコメント解除
+
+        // Firebase設定とアプリID (Canvas環境変数または直接設定)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyCEY4STaXH9VFOFsgWhVsBOnXYms6hsmrs",
+            authDomain: "apply-1a484.firebaseapp.com",
+            projectId: "apply-1a484",
+            storageBucket: "apply-1a484.firebasestorage.app",
+            messagingSenderId: "199727158863",
+            appId: "1:199727158863:web:5de725f0559bec0d92bc3a",
+            measurementId: "G-KCR1K24259"
+        };
+        // JavaScript内で使用するappId (Firestoreのパス用)。今回はprojectIdを使用。
+        const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
+
+        // Firebase アプリの初期化
+        let app;
+        let auth;
+        let db;
+        // let analytics; // 必要であればコメント解除
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            // analytics = getAnalytics(app); // 必要であればコメント解除
+            setLogLevel('debug'); // Firebaseのデバッグログを有効化
+            console.log("Firebase Initialized successfully. App context ID for Firestore path:", appId);
+        } catch (e) {
+            console.error("Firebase initialization error:", e);
+            const formMessageEl = document.getElementById('form-message');
+            if (formMessageEl) {
+                 formMessageEl.textContent = 'アプリケーションの初期化に失敗しました。ページを再読み込みしてください。';
+                 formMessageEl.className = 'mt-4 text-center text-red-600 p-3 bg-red-100 rounded-md';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async function () {
             // 年を自動更新
             document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-            // スムーズスクロールとアクティブリンク処理
-            const navLinks = document.querySelectorAll('header nav a[href^="#"], header #mobile-menu a[href^="#"], footer a[href^="#"], .hero-bg a[href^="#"], #features a[href^="#pricing"]'); // CTAボタンも対象に
+            // Firebase 認証処理
+            if (auth && db) { // Firebaseが正常に初期化された場合のみ実行
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                        console.log("Signed in with custom token.");
+                    } else {
+                        await signInAnonymously(auth);
+                        console.log("Signed in anonymously. UID:", auth.currentUser ? auth.currentUser.uid : "N/A");
+                    }
+                } catch (error) {
+                    console.error("Firebase Authentication Error:", error);
+                    const formMessageEl = document.getElementById('form-message');
+                    if (formMessageEl) {
+                        formMessageEl.textContent = '認証エラーが発生しました。フォーム機能が利用できない可能性があります。';
+                        formMessageEl.className = 'mt-4 text-center text-orange-600 p-3 bg-orange-100 rounded-md';
+                    }
+                }
+            }
+
+            // お問い合わせフォームの処理
+            const contactForm = document.getElementById('contactForm');
+            const formMessageEl = document.getElementById('form-message');
+
+            if (contactForm && auth && db) { // Firebaseが利用可能な場合のみリスナーを設定
+                contactForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    formMessageEl.textContent = ''; 
+                    formMessageEl.className = 'mt-4 text-center'; 
+
+                    if (!auth.currentUser) {
+                        formMessageEl.textContent = '認証が完了していません。しばらく待ってから再試行してください。';
+                        formMessageEl.className = 'mt-4 text-center text-red-600 p-3 bg-red-100 rounded-md';
+                        console.error("User not authenticated. Cannot submit form.");
+                        try { // 再認証を試みる
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                await signInWithCustomToken(auth, __initial_auth_token);
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                            if(auth.currentUser) {
+                                formMessageEl.textContent = '再認証しました。もう一度送信してください。';
+                                formMessageEl.className = 'mt-4 text-center text-blue-600 p-3 bg-blue-100 rounded-md';
+                                console.log("Re-authenticated. UID:", auth.currentUser.uid);
+                            }
+                        } catch (authError) {
+                             console.error("Re-authentication failed:", authError);
+                        }
+                        return;
+                    }
+
+                    const name = document.getElementById('name').value.trim();
+                    const company = document.getElementById('company').value.trim();
+                    const email = document.getElementById('email').value.trim();
+                    const phone = document.getElementById('phone').value.trim();
+                    const message = document.getElementById('message').value.trim();
+
+                    if (!name || !email || !message) {
+                        formMessageEl.textContent = '必須項目（お名前、メールアドレス、お問い合わせ内容）をすべて入力してください。';
+                        formMessageEl.className = 'mt-4 text-center text-red-600 p-3 bg-red-100 rounded-md';
+                        return;
+                    }
+
+                    const submitButton = contactForm.querySelector('button[type="submit"]');
+                    submitButton.disabled = true;
+                    submitButton.textContent = '送信中...';
+
+                    try {
+                        const submissionData = {
+                            name: name,
+                            company: company || null,
+                            email: email,
+                            phone: phone || null,
+                            message: message,
+                            submittedAt: serverTimestamp(),
+                            userId: auth.currentUser.uid, 
+                            appContextId: appId // JavaScript側のappIdを保存
+                        };
+
+                        const collectionPath = `/artifacts/${appId}/public/data/contactForms`;
+                        console.log("Submitting to Firestore path:", collectionPath, "with data:", submissionData);
+                        await addDoc(collection(db, collectionPath), submissionData);
+
+                        formMessageEl.textContent = 'お問い合わせありがとうございます。メッセージが送信されました。';
+                        formMessageEl.className = 'mt-4 text-center text-green-600 p-3 bg-green-100 rounded-md';
+                        contactForm.reset();
+                    } catch (error) {
+                        console.error("Error adding document to Firestore: ", error);
+                        formMessageEl.textContent = '送信中にエラーが発生しました。しばらくしてからもう一度お試しください。';
+                        formMessageEl.className = 'mt-4 text-center text-red-600 p-3 bg-red-100 rounded-md';
+                    } finally {
+                        submitButton.disabled = false;
+                        submitButton.textContent = '送信する';
+                    }
+
+                    setTimeout(() => {
+                        formMessageEl.textContent = '';
+                        formMessageEl.className = 'mt-4 text-center';
+                    }, 7000);
+                });
+            } else if (contactForm) {
+                 formMessageEl.textContent = 'フォームの初期化に問題が発生しました。ページを再読み込みしてください。';
+                 formMessageEl.className = 'mt-4 text-center text-red-600 p-3 bg-red-100 rounded-md';
+            }
+
+
+            // スムーズスクロールとアクティブリンク処理 (既存のコード)
+            const navLinks = document.querySelectorAll('header nav a[href^="#"], header #mobile-menu a[href^="#"], footer a[href^="#"], .hero-bg a[href^="#"], #features a[href^="#pricing"]');
             const sections = document.querySelectorAll('main section');
             const headerHeight = document.querySelector('header').offsetHeight;
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
             const allNavLinks = document.querySelectorAll('header nav a[data-section], #mobile-menu a[data-section]');
 
-
             function changeActiveLink() {
                 let currentSectionId = '';
-                // 現在表示されているセクションを特定
                 sections.forEach(section => {
                     const sectionTop = section.offsetTop;
-                    if (window.scrollY >= sectionTop - headerHeight - 50) { // 50pxのオフセットを追加して判定を調整
+                    if (window.scrollY >= sectionTop - headerHeight - 50) {
                         currentSectionId = section.id;
                     }
                 });
@@ -390,7 +529,6 @@
                 });
             }
             
-            // 初期ロード時とスクロール時にアクティブリンクを更新
             window.addEventListener('scroll', changeActiveLink);
             changeActiveLink(); 
 
@@ -400,21 +538,18 @@
                     const targetId = this.getAttribute('href');
                     const targetElement = document.querySelector(targetId);
                     if (targetElement) {
-                        // モバイルメニューが開いていれば閉じる
                         if (!mobileMenu.classList.contains('hidden')) {
                             mobileMenu.classList.add('hidden');
-                            mobileMenuButton.children[0].classList.remove('hidden'); // Show burger
-                            mobileMenuButton.children[1].classList.add('hidden'); // Hide X
+                            mobileMenuButton.children[0].classList.remove('hidden'); 
+                            mobileMenuButton.children[1].classList.add('hidden'); 
                             mobileMenuButton.setAttribute('aria-expanded', 'false');
                         }
                         
-                        // スクロール実行
                         window.scrollTo({
                             top: targetElement.offsetTop - headerHeight,
                             behavior: 'smooth'
                         });
 
-                        // クリックされたリンクを即座にアクティブにする (スクロール完了を待たずに)
                         allNavLinks.forEach(link => {
                             link.classList.remove('nav-link-active');
                             link.removeAttribute('aria-current');
@@ -433,16 +568,13 @@
                 });
             });
 
-
-            // モバイルメニューのトグル
             mobileMenuButton.addEventListener('click', () => {
                 const isExpanded = mobileMenu.classList.toggle('hidden');
                 mobileMenuButton.setAttribute('aria-expanded', String(!isExpanded));
-                mobileMenuButton.children[0].classList.toggle('hidden'); // Toggle burger
-                mobileMenuButton.children[1].classList.toggle('hidden'); // Toggle X
+                mobileMenuButton.children[0].classList.toggle('hidden'); 
+                mobileMenuButton.children[1].classList.toggle('hidden'); 
             });
             
-            // FAQアコーディオン
             const faqItems = document.querySelectorAll('.faq-item');
             faqItems.forEach(item => {
                 const questionButton = item.querySelector('.faq-question');
@@ -456,23 +588,6 @@
                     questionButton.setAttribute('aria-expanded', String(!isHidden));
                 });
             });
-
-            // お問い合わせフォームの処理 (ダミー)
-            const contactForm = document.getElementById('contactForm');
-            const formMessage = document.getElementById('form-message');
-            if (contactForm) {
-                contactForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    formMessage.textContent = 'お問い合わせありがとうございます。メッセージが送信されました。';
-                    formMessage.className = 'mt-4 text-center text-green-600 p-3 bg-green-100 rounded-md';
-                    contactForm.reset();
-
-                    setTimeout(() => {
-                        formMessage.textContent = '';
-                        formMessage.className = 'mt-4 text-center';
-                    }, 5000);
-                });
-            }
         });
     </script>
 </body>
